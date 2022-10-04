@@ -3,10 +3,12 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth.js'
 import postRoutes from './routes/post.js'
+import cookieParser from 'cookie-parser';
 
 const app = express()
 dotenv.config()
 
+app.use(cookieParser());
 app.use(express.json({extended: true}))
 
 // localhost:3005/api/auth/register

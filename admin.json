@@ -1,0 +1,12 @@
+{
+	"user1": {
+		"email": "nazik_1@mail.ru",
+		"username": "Mazon2",
+		"password": "password"
+	},
+	"user2": {
+		"email": "nazik_11@mail.ru",
+		"username": "Mazon3",
+		"password": "password"
+	}
+}

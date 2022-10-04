@@ -10,12 +10,10 @@ const PostSchema = new mongoose.Schema({
         required: true,
     },
     comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment",
+        type: String,
     }],
     author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        type: String,
     },
     img:{
         type: String,
