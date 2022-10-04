@@ -4,11 +4,10 @@ import PostModel from "../models/Post.js";
 import { checkAuth } from "../utils/checkAuth.js";
 
 const router = Router();
-
-router.post("/", async (req, res) => {
+router.post("/", checkAuth, async (req, res) => {
   try {
-    const { title, description, img, userId } = req.body;
-    const user = await UserModel.findById(userId);
+    const { title, description, img } = req.body;
+    const user = await UserModel.findById(req.user.userId);
     const post = new PostModel({
       title,
       description,
