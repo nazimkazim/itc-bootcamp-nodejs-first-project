@@ -15,12 +15,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  posts: [
-    {
+  posts: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Post",
     },
-  ] 
+   
 },{ timestamps: true });
 
 export default mongoose.model("User", UserSchema);

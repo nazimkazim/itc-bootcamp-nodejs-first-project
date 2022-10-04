@@ -9,9 +9,10 @@ const PostSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
-    comments: [{
-        type: String,
-    }],
+    comments: {
+        type: [String],
+        default:[]
+    },
     author: {
         type: String,
     },
@@ -23,12 +24,10 @@ const PostSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    likes:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        }
-    ]
+    likes:{
+        type:[String],
+        default:[]
+    }
 }, {timestamps: true});
 
 export default mongoose.model("Post", PostSchema);

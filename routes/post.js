@@ -13,6 +13,7 @@ router.post("/", checkAuth, async (req, res) => {
       description,
       img,
     });
+    post.author = user._id;
     await post.save();
     await UserModel.findByIdAndUpdate(user._id, {
         $push: { posts: post },
@@ -40,5 +41,20 @@ router.get("/:id", async (req, res) => {
         res.status(400).send({ error: error.message });
     }
 })
+
+router.delete("/:id", checkAuth, async (req, res) => {
+    try {
+        const post = await PostModel.findById(req.params.id);
+        if (post.author.toString() === req.user.userId) {
+            await PostModel.findByIdAndDelete(req.params.id);
+            await UserModel.remove({ "posts": { "$in": req.params.id } });
+            res.status(200).json({ message: "Post deleted" });
+        } else {
+            res.status(400).json({ message: "You are not the author" });
+        }
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
+});
 
 export default router;
