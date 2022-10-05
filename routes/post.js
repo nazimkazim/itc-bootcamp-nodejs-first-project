@@ -57,4 +57,29 @@ router.delete("/:id", checkAuth, async (req, res) => {
     }
 });
 
+router.put("/:id", checkAuth, async (req, res) => {
+    try {
+        const post = await PostModel.findById(req.params.id);
+        if (post.author.toString() === req.user.userId) {
+            await PostModel.findByIdAndUpdate(req.params.id, req.body);
+            res.status(200).json({ message: "Post updated" });
+        } else {
+            res.status(400).json({ message: "You are not the author" });
+        }
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
+});
+
+router.get("/user/:userId", checkAuth, async (req, res) => {
+    try {
+        const post = await PostModel.find({ author: req.params.userId });
+        console.log(post);
+        console.log(req.params.userId);
+        res.status(200).json(post);
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
+});
+
 export default router;
