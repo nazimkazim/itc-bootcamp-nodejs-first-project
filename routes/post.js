@@ -59,4 +59,38 @@ router.delete("/:id", checkAuth, async (req, res) => {
     }
 })
 
+router.put("/:id", checkAuth, async (req, res) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+    if (post.author.toString() == req.user.userId) {
+      await PostModel.findByIdAndUpdate(req.params.id, req.body);
+      res.status(200).json({message: "Post updated"});
+    }
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+})
+
+router.get("/view/:id", async (req, res) => {
+  try {
+    await PostModel.findByIdAndUpdate(req.params.id, {
+      $inc: {views: 1}
+    })
+    res.status(200).json({message: "View added"});
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+})
+
+router.get("/s/tags", async (req, res) => {
+  try {
+    const tags = req.query.tags.split(",");
+    console.log(tags);
+    const posts = await PostModel.find({tags: {$in: tags }});
+    res.status(200).send({posts});
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+})
+
 export default router;
