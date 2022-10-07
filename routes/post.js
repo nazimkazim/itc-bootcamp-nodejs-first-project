@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
-        const post = await PostModel.findById(req.params.id).populate("author");
+        const post = await PostModel.findById(req.params.id).populate("author").populate("comments");
         res.status(200).json(post);
     } catch (error) {
         res.status(400).send({ error: error.message });
