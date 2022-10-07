@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/post.js";
+import commentRoutes from "./routes/comment.js";
 import cookieParser from "cookie-parser";   
 
 const app = express();
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
 // localhost:3005/api/auth/register
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
+app.use("/api/comment", commentRoutes);
 
 function start() {
   try {
