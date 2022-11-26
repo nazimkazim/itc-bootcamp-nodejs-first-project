@@ -11,7 +11,7 @@ router.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
     const isUser = await UserModel.findOne({ email, username });
     if (isUser) {
-      res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "User already exists" });
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -23,17 +23,16 @@ router.post("/register", async (req, res) => {
     await savedUser.save();
     res.status(201).json({ message: "User created" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 });
 
 router.post("/login", async (req, res) => {
   try {
     const { email, password, username } = req.body;
-    const user = await UserModel.findOne({ email, username });
+    const user = await UserModel.findOne({ email, username }).lean();
     if (!user) {
-      res.status(400).json({ message: "User not found" });
-      throw new Error("User not found");
+      return res.status(400).json({ message: "User not found" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -43,10 +42,12 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("access_token", token, {httpOnly:true})
-    .status(200).json({token, userId: user.id, message:"User logged in"});
+    .status(200).json({token, user: {
+      ...user,
+      password: null,
+    }, message:"User logged in"});
   } catch (error) {
-    console.log('Error',error)
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 
