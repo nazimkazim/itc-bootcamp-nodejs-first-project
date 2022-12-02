@@ -5,20 +5,19 @@ import { checkAuth } from "../utils/checkAuth.js";
 
 const router = Router();
 
-router.post("/", checkAuth, async (req, res) => {
+router.post("/:id", checkAuth, async (req, res) => {
   try {
     const { title, description, img, tags } = req.body;
-    const user = await UserModel.findById(req.user.userId);
+    const userId = await UserModel.findById(req.params.id);
     const post = new PostModel({
       title,
       description,
       img,
       tags: tags.map((tag) => tag.toLowerCase()),
     });
-    console.log(post);
-    post.author = user._id;
+    post.author = userId;
     await post.save();
-    await UserModel.findByIdAndUpdate(user._id, {
+    await UserModel.findByIdAndUpdate(userId, {
       $push: { posts: post },
     });
     res.status(201).json({ message: "Post created" });
@@ -48,13 +47,14 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
+  const {userId} = req.body
   try {
     const post = await PostModel.findById(req.params.id);
-    if (post.author.toString() !== req.user.userId) {
+    if (post.author.toString() !== userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     await PostModel.findByIdAndDelete(req.params.id);
-    const user = await UserModel.findById(req.user.userId);
+    const user = await UserModel.findById(userId);
     user.posts.splice(user.posts.indexOf(req.params.id), 1);
     await user.save();
     res.status(200).json({ message: "Post deleted" });
