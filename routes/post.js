@@ -26,7 +26,7 @@ router.post("/:id", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/",checkAuth, async (req, res) => {
   try {
     const post = await PostModel.find().populate("author");
     res.status(200).json(post);
@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", checkAuth, async (req, res) => {
   try {
     const post = await PostModel.findById(req.params.id)
       .populate("author")
@@ -66,8 +66,14 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", checkAuth, async (req, res) => {
   try {
     const post = await PostModel.findById(req.params.id);
-    if (post.author.toString() == req.user.userId) {
-      await PostModel.findByIdAndUpdate(req.params.id, req.body);
+    const { title, description, img, tags } = req.body;
+    if (post.author.toString() == req.body.userId) {
+      await PostModel.findByIdAndUpdate(req.params.id, {
+        title,
+        description,
+        img,
+        tags: tags.split(",").map((tag) => tag.toLowerCase()),
+      });
       res.status(200).json({ message: "Post updated" });
     }
   } catch (error) {
