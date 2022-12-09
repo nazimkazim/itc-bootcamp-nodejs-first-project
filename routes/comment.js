@@ -6,11 +6,11 @@ const router = Router();
 
 router.post("/", checkAuth, async (req, res) => {
   try {
-      const { postId, desc } = req.body;
+      const { postId, desc, userId } = req.body;
       const newComment = new CommentModel({
         desc,
         post: postId,
-        author: req.user.userId,
+        author: userId,
       });
       const comment = await newComment.save();
       const post = await PostModel.findById(postId);
@@ -24,7 +24,7 @@ router.post("/", checkAuth, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const comment = await CommentModel.find();
+    const comment = await CommentModel.find({}).populate("author");
     res.status(200).json(comment);
   } catch (error) {
     res.status(400).send({ error: error.message });
@@ -33,8 +33,9 @@ router.get("/", async (req, res) => {
 
 router.delete("/:id", checkAuth, async (req, res) => {
   const comment = await CommentModel.findById(req.params.id);
+  const {userId} = req.body;
   try {
-    if (req.user.userId === comment.author.toString()) {
+    if (userId === comment.author.toString()) {
       const post = await PostModel.findById(comment.post);
       await comment.delete();
       post.comments = post.comments.filter(
