@@ -39,7 +39,12 @@ router.get("/:id", checkAuth, async (req, res) => {
   try {
     const post = await PostModel.findById(req.params.id)
       .populate("author")
-      .populate("comments");
+      .populate({
+        path: "comments",
+        populate: {
+          path: "author",
+        },
+      });
     res.status(200).json(post);
   } catch (error) {
     res.status(400).send({ error: error.message });

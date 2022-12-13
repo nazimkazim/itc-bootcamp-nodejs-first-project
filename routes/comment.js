@@ -32,7 +32,7 @@ router.get("/", async (req, res) => {
 });
 
 router.delete("/:id", checkAuth, async (req, res) => {
-  const comment = await CommentModel.findById(req.params.id);
+  const comment = await CommentModel.findById(req.params.id).populate("author");
   const {userId} = req.body;
   try {
     if (userId === comment.author.toString()) {
