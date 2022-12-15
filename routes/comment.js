@@ -35,7 +35,7 @@ router.delete("/:id", checkAuth, async (req, res) => {
   const comment = await CommentModel.findById(req.params.id).populate("author");
   const {userId} = req.body;
   try {
-    if (userId === comment.author.toString()) {
+    if (userId === comment.author._id.toString()) {
       const post = await PostModel.findById(comment.post);
       await comment.delete();
       post.comments = post.comments.filter(
