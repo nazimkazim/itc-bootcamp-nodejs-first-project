@@ -24,8 +24,8 @@ const PostSchema = new mongoose.Schema(
       type: [String],
     },
     img: {
-      type: String,
-      required: true,
+      url: String,
+      filename: String,
     },
     views: {
       type: Number,

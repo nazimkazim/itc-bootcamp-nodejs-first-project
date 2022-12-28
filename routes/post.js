@@ -2,18 +2,27 @@ import { Router } from "express";
 import UserModel from "../models/User.js";
 import PostModel from "../models/Post.js";
 import { checkAuth } from "../utils/checkAuth.js";
+import multer from "multer";
+import cloudinary from "../cloudinary/index.js";
+
+const upload = multer({ storage: cloudinary.storage });
 
 const router = Router();
 
-router.post("/:id", checkAuth, async (req, res) => {
+router.post("/:id", checkAuth, upload.single("img"), async (req, res) => {
   try {
-    const { title, description, img, tags } = req.body;
+    const { title, description, tags } = req.body;
+    console.log(tags)
+    const img = {
+      url: req.file.path,
+      filename: req.file.filename,
+    };
     const userId = await UserModel.findById(req.params.id);
     const post = new PostModel({
       title,
       description,
       img,
-      tags: tags.map((tag) => tag.toLowerCase()),
+      tags: tags.split(",").map((tag) => tag.toLowerCase()),
     });
     post.author = userId;
     await post.save();
@@ -26,7 +35,7 @@ router.post("/:id", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/",checkAuth, async (req, res) => {
+router.get("/", checkAuth, async (req, res) => {
   try {
     const post = await PostModel.find().populate("author");
     res.status(200).json(post);
@@ -52,7 +61,7 @@ router.get("/:id", checkAuth, async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const {userId} = req.body
+  const { userId } = req.body;
   try {
     const post = await PostModel.findById(req.params.id);
     if (post.author.toString() !== userId) {
@@ -150,12 +159,12 @@ router.put("/unlike/:postId", checkAuth, async (req, res) => {
     if (postId) {
       await PostModel.findByIdAndUpdate(postId, {
         $pull: { likes: userId },
-      })
+      });
     }
     res.status(200).json({ message: "Like removed" });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
-})
+});
 
 export default router;

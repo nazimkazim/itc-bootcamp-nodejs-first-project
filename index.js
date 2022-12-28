@@ -4,11 +4,13 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
-import cookieParser from "cookie-parser";   
+import cookieParser from "cookie-parser"; 
+import bodyParser from "body-parser";
 
 const app = express();
 dotenv.config();
 
+app.use(bodyParser.json({ limit: "50mb" }))
 app.use(express.json({ extended: true }));
 app.use(cookieParser());
 
