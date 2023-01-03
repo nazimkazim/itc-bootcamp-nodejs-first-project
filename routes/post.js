@@ -12,7 +12,7 @@ const router = Router();
 router.post("/:id", checkAuth, upload.single("img"), async (req, res) => {
   try {
     const { title, description, tags } = req.body;
-    console.log(tags)
+    console.log(tags);
     const img = {
       url: req.file.path,
       filename: req.file.filename,
@@ -47,13 +47,13 @@ router.get("/", checkAuth, async (req, res) => {
 router.get("/:id", checkAuth, async (req, res) => {
   try {
     const post = await PostModel.findById(req.params.id)
-      .populate("author")
       .populate({
         path: "comments",
         populate: {
           path: "author",
         },
-      });
+      })
+      .populate("author");
     res.status(200).json(post);
   } catch (error) {
     res.status(400).send({ error: error.message });
@@ -70,6 +70,9 @@ router.delete("/:id", async (req, res) => {
     await PostModel.findByIdAndDelete(req.params.id);
     const user = await UserModel.findById(userId);
     user.posts.splice(user.posts.indexOf(req.params.id), 1);
+    if (post.img) {
+      await cloudinary.cloudinary.uploader.destroy(post.img.filename);
+    }
     await user.save();
     res.status(200).json({ message: "Post deleted" });
   } catch (error) {
@@ -108,7 +111,7 @@ router.get("/view/:id", async (req, res) => {
 
 router.get("/user/:userId", checkAuth, async (req, res) => {
   try {
-    const post = await PostModel.find({ author: req.params.userId });
+    const post = await PostModel.find({ author: req.params.userId }).populate('author');
     res.status(200).json(post);
   } catch (error) {
     res.status(400).send({ error: error.message });
