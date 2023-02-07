@@ -6,8 +6,11 @@ import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
 import cookieParser from "cookie-parser"; 
 import bodyParser from "body-parser";
+import { logger } from "./middleware/logger.js";
+
 
 const app = express();
+app.use(logger);
 dotenv.config();
 
 app.use(bodyParser.json({ limit: "50mb" }))
