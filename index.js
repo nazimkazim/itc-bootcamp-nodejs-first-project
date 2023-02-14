@@ -7,25 +7,27 @@ import commentRoutes from "./routes/comment.js";
 import cookieParser from "cookie-parser"; 
 import bodyParser from "body-parser";
 import { logger } from "./middleware/logger.js";
+import errorHandler from "./middleware/errorHandler.js";
+import cors from "cors";
+import corsOptions from "./config/corsOptions.js";
 
 
 const app = express();
 app.use(logger);
+app.use(cors(corsOptions));
+
 dotenv.config();
 
 app.use(bodyParser.json({ limit: "50mb" }))
 app.use(express.json({ extended: true }));
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
-
 // localhost:3005/api/auth/register
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
+
+app.use(errorHandler);
 
 function start() {
   try {
